@@ -1,6 +1,6 @@
 # next-ts-logger
 
-A structured logger for Next.js compatible with Pino and Winston.
+This acts as log interceptor for next.js applications. Compatible with Pino and Winston.
 
 ## Installation
 
@@ -27,11 +27,13 @@ Create an `instrumentation.ts` file in your Next.js project root (or `src/` dire
 ```ts
 // instrumentation.ts
 import pino from "pino";
-import { createNextLogger } from "next-ts-logger";
+import { registerNextLogger } from "next-ts-logger";
 
 export function register() {
-  const logger = pino();
-  createNextLogger(logger);
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const logger = pino();
+    registerNextLogger(logger);
+  }
 }
 ```
 
@@ -40,12 +42,14 @@ export function register() {
 ```ts
 // instrumentation.ts
 import winston from "winston";
-import { createNextLogger } from "next-ts-logger";
+import { registerNextLogger } from "next-ts-logger";
 
 export function register() {
-  const logger = winston.createLogger({
-    transports: [new winston.transports.Console()],
-  });
-  createNextLogger(logger);
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const logger = winston.createLogger({
+      transports: [new winston.transports.Console()],
+    });
+    registerNextLogger(logger);
+  }
 }
 ```
