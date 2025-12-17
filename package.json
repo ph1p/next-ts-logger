@@ -1,7 +1,7 @@
 {
 	"name": "next-ts-logger",
 	"type": "module",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": false,
 	"author": {
 		"name": "Philip Stapelfeldt",
@@ -9,9 +9,9 @@
 		"url": "https://ph1p.dev"
 	},
 	"repository": {
-    "type": "git",
-    "url": "git+https://github.com/ph1p/next-ts-logger.git"
-  },
+		"type": "git",
+		"url": "git+https://github.com/ph1p/next-ts-logger.git"
+	},
 	"license": "MIT",
 	"description": "A structured logger for Next.js compatible with Pino and Winston",
 	"exports": {
