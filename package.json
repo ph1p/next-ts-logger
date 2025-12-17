@@ -1,7 +1,7 @@
 {
 	"name": "next-ts-logger",
 	"type": "module",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"private": false,
 	"description": "A structured logger for Next.js compatible with Pino and Winston",
 	"exports": {
