@@ -2,6 +2,10 @@
 
 This acts as log interceptor for next.js applications. Compatible with Pino and Winston.
 
+## Motivation
+
+I was using pino and wanted to have also get my Next.js application work with it. I stumpled upon [next-logger](https://github.com/sainsburys-tech/next-logger), but it does not support TypeScript and started to get buggy with turbopack enabled, so I decided to create this package.
+
 ## Installation
 
 ```bash

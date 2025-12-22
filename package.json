@@ -48,9 +48,9 @@
 	},
 	"devDependencies": {
 		"@types/node": "^25.0.3",
-		"next": "^16.0.10",
+		"next": "^16.1.0",
 		"pino": "^10.1.0",
-		"tsdown": "^0.18.0",
+		"tsdown": "^0.18.2",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.16"
 	}
