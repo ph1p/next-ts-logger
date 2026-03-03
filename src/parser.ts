@@ -1,4 +1,4 @@
-import { prefixes } from "next/dist/build/output/log";
+import { prefixes } from "next/dist/build/output/log.js";
 import type { HttpRequestLog, LogLevel, ParsedLog } from "./types";
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Required for ANSI escape sequence matching

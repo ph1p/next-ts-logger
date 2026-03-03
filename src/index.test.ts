@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { registerNextLogger, type Logger } from "./index";
+import { type Logger, registerNextLogger } from "./index";
 
 function createMockLogger(): Logger & {
 	calls: { method: string; args: unknown[] }[];
