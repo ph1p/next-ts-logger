@@ -199,4 +199,129 @@ describe("registerNextLogger", () => {
 			expect(passedThrough).toBe("Regular output\n");
 		});
 	});
+
+	describe("prefixed log interception", () => {
+		it("should intercept wait prefix via console.log", () => {
+			registerNextLogger(mockLogger);
+			console.log(" ○ Compiling /page...");
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].method).toBe("info");
+			expect(mockLogger.calls[0].args[0]).toBe("○ Compiling /page...");
+		});
+
+		it("should intercept error prefix via console.error", () => {
+			registerNextLogger(mockLogger);
+			console.error(" ⨯ Unhandled error");
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].method).toBe("error");
+			expect(mockLogger.calls[0].args[0]).toBe("⨯ Unhandled error");
+		});
+
+		it("should intercept warn prefix via console.warn", () => {
+			registerNextLogger(mockLogger);
+			console.warn(" ⚠ Fast Refresh had to perform a full reload");
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].method).toBe("warn");
+			expect(mockLogger.calls[0].args[0]).toBe(
+				"⚠ Fast Refresh had to perform a full reload",
+			);
+		});
+
+		it("should intercept event prefix via console.log", () => {
+			registerNextLogger(mockLogger);
+			console.log(" ✓ Compiled successfully");
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].method).toBe("info");
+			expect(mockLogger.calls[0].args[0]).toBe("✓ Compiled successfully");
+		});
+
+		it("should intercept trace prefix via console.log", () => {
+			registerNextLogger(mockLogger);
+			console.log(" » some trace info");
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].method).toBe("trace");
+		});
+	});
+
+	describe("stdout.write edge cases", () => {
+		it("should handle Buffer input in stdout.write", () => {
+			registerNextLogger(mockLogger);
+			process.stdout.write(Buffer.from("GET /api 200 in 10ms\n"));
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].args[0]).toEqual({
+				method: "GET",
+				path: "/api",
+				statusCode: 200,
+				duration: 10,
+			});
+		});
+
+		it("should strip ANSI from stdout.write HTTP logs", () => {
+			registerNextLogger(mockLogger);
+			process.stdout.write("\x1b[32mGET\x1b[0m /api 200 in 5ms\n");
+
+			expect(mockLogger.calls).toHaveLength(1);
+			expect(mockLogger.calls[0].args[0]).toEqual({
+				method: "GET",
+				path: "/api",
+				statusCode: 200,
+				duration: 5,
+			});
+		});
+	});
+
+	describe("child logger", () => {
+		it("should call child with next.js name binding", () => {
+			let childBindings: Record<string, unknown> | undefined;
+			const childLogger = createMockLogger();
+			const parentLogger: Logger = {
+				...createMockLogger(),
+				child: (bindings) => {
+					childBindings = bindings;
+					return childLogger;
+				},
+			};
+
+			registerNextLogger(parentLogger);
+			expect(childBindings).toEqual({ name: "next.js" });
+		});
+
+		it("should use child logger for intercepted logs", () => {
+			const childLogger = createMockLogger();
+			const parentLogger: Logger = {
+				...createMockLogger(),
+				child: () => childLogger,
+			};
+
+			registerNextLogger(parentLogger);
+			console.log("GET /test 200 in 10ms");
+
+			expect(childLogger.calls).toHaveLength(1);
+			expect(childLogger.calls[0].method).toBe("info");
+		});
+	});
+
+	describe("multiple calls", () => {
+		it("should handle multiple console.log calls", () => {
+			registerNextLogger(mockLogger);
+			console.log("GET /a 200 in 1ms");
+			console.log("POST /b 201 in 2ms");
+			console.log("   Startup message");
+
+			expect(mockLogger.calls).toHaveLength(3);
+			expect(mockLogger.calls[0].args[0]).toEqual(
+				expect.objectContaining({ path: "/a" }),
+			);
+			expect(mockLogger.calls[1].args[0]).toEqual(
+				expect.objectContaining({ path: "/b" }),
+			);
+			expect(mockLogger.calls[2].args[0]).toBe("Startup message");
+		});
+	});
 });
